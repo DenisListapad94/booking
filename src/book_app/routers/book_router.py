@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 
 router = APIRouter(
     prefix="",
@@ -28,3 +28,4 @@ def get_query_path_params(item_id: int, name: str) -> dict:
         "item_id": item_id,
         "name": name
     }
+
