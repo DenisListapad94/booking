@@ -1,6 +1,18 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, status
+from sqlalchemy.orm import Session
 
-from src.auth.schemas.user_schema import User
+from src.auth.schemas.user_schema import (
+    UserCreateSchema,
+    UserReadSchema, UserUpdateSchema,
+)
+from src.auth.services.user_service import (
+    create_user,
+    get_users,
+    get_user,
+    update_user,
+    delete_user,
+)
+from src.database import SessionLocal
 
 router = APIRouter(
     prefix="/users",
@@ -8,14 +20,78 @@ router = APIRouter(
 )
 
 
-@router.post("", response_model=User)
-def get_user() -> User:
-    user_db = {
-        "id": 1,
-        "age": 24,
-        "name": "User",
-        "surname": "Userskiy",
-        "email": "user@example.com"
-    }
-    user = User(**user_db)
-    return user
+def get_session():
+    session = SessionLocal()
+    try:
+        yield session
+    finally:
+        session.close()
+
+
+# create user
+@router.post(
+    "",
+    response_model=UserCreateSchema,
+)
+def create_user_handler(
+        body: UserCreateSchema,
+        session: Session = Depends(get_session),
+):
+    return create_user(
+        session=session,
+        body=body,
+    )
+
+
+@router.get(
+    "",
+    response_model=list[UserReadSchema]
+)
+def read_users_handler(session: Session = Depends(get_session)):
+    return get_users(
+        session=session,
+    )
+
+
+@router.get(
+    "/{user_id}",
+    response_model=UserReadSchema | None
+)
+def read_user_handler(
+        user_id: int,
+        session: Session = Depends(get_session)
+):
+    return get_user(
+        session=session,
+        user_id=user_id
+    )
+
+
+@router.put(
+    "/{user_id}",
+    response_model=UserUpdateSchema
+)
+def update_user_handler(
+        user_id: int,
+        body: UserUpdateSchema,
+        session: Session = Depends(get_session)
+):
+    return update_user(
+        session=session,
+        user_id=user_id,
+        body=body
+    )
+
+
+@router.delete(
+    "/{user_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def delete_user_handler(
+        user_id: int,
+        session: Session = Depends(get_session)
+):
+    delete_user(
+        session=session,
+        user_id=user_id,
+    )

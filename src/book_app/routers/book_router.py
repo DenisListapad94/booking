@@ -15,10 +15,10 @@ def get_path_params(item_id: int, name: str, ) -> dict:  # Эндпоинт, в�
 
 
 @router.get("/")
-def get_query_params(item_id: int, name: str, ) -> dict:
+def get_query_params() -> dict:
     return {
-        "item_id": item_id,
-        "name": name
+        "DB_PORT": "some port",
+        "DB_HOST": "some host",
     }
 
 
