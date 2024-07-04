@@ -4,7 +4,6 @@ from typing import Optional
 from pydantic import (
     BaseModel,
     ConfigDict,
-    Field,
 )
 
 from src.auth.enums import UserRole
@@ -16,13 +15,16 @@ class UserBaseSchema(BaseModel):
     role: UserRole
 
 
-
 class UserCreateSchema(UserBaseSchema):
     pass
 
+
 class UserReadSchema(UserBaseSchema):
+    id: int
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+
+
 class UserUpdatePartialSchema(BaseModel):
     first_name: str | None = None
     last_name: str | None = None

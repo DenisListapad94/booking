@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, status
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.schemas.user_schema import (
     UserCreateSchema,
-    UserReadSchema, UserUpdateSchema,
+    UserReadSchema, UserUpdateSchema, UserCreateRetrieveSchema,
 )
 from src.auth.services.user_service import (
     create_user,
@@ -12,7 +12,9 @@ from src.auth.services.user_service import (
     update_user,
     delete_user,
 )
-from src.database import SessionLocal
+from src.database import get_async_session
+
+# from src.database import SessionLocal
 
 router = APIRouter(
     prefix="/users",
@@ -20,24 +22,24 @@ router = APIRouter(
 )
 
 
-def get_session():
-    session = SessionLocal()
-    try:
-        yield session
-    finally:
-        session.close()
+# def get_session():
+#     session = SessionLocal()
+#     try:
+#         yield session
+#     finally:
+#         session.close()
 
 
 # create user
 @router.post(
     "",
-    response_model=UserCreateSchema,
+    response_model=UserCreateRetrieveSchema,
 )
-def create_user_handler(
+async def create_user_handler(
         body: UserCreateSchema,
-        session: Session = Depends(get_session),
+        session: AsyncSession = Depends(get_async_session),
 ):
-    return create_user(
+    return await create_user(
         session=session,
         body=body,
     )
@@ -47,8 +49,8 @@ def create_user_handler(
     "",
     response_model=list[UserReadSchema]
 )
-def read_users_handler(session: Session = Depends(get_session)):
-    return get_users(
+async def read_users_handler(session: AsyncSession = Depends(get_async_session), ):
+    return await get_users(
         session=session,
     )
 
@@ -57,11 +59,11 @@ def read_users_handler(session: Session = Depends(get_session)):
     "/{user_id}",
     response_model=UserReadSchema | None
 )
-def read_user_handler(
+async def read_user_handler(
         user_id: int,
-        session: Session = Depends(get_session)
+        session: AsyncSession = Depends(get_async_session),
 ):
-    return get_user(
+    return await get_user(
         session=session,
         user_id=user_id
     )
@@ -71,12 +73,12 @@ def read_user_handler(
     "/{user_id}",
     response_model=UserUpdateSchema
 )
-def update_user_handler(
+async def update_user_handler(
         user_id: int,
         body: UserUpdateSchema,
-        session: Session = Depends(get_session)
+        session: AsyncSession = Depends(get_async_session),
 ):
-    return update_user(
+    return await update_user(
         session=session,
         user_id=user_id,
         body=body
@@ -87,11 +89,11 @@ def update_user_handler(
     "/{user_id}",
     status_code=status.HTTP_204_NO_CONTENT,
 )
-def delete_user_handler(
+async def delete_user_handler(
         user_id: int,
-        session: Session = Depends(get_session)
+        session: AsyncSession = Depends(get_async_session),
 ):
-    delete_user(
+    await delete_user(
         session=session,
         user_id=user_id,
     )
