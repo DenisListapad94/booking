@@ -45,6 +45,7 @@ class BaseUser(schemas.BaseUser[uuid.UUID]):
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
+
 class UserRead(schemas.BaseUser[uuid.UUID]):
     first_name: str | None
     last_name: str | None

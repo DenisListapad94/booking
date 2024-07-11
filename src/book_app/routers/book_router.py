@@ -14,7 +14,7 @@ def get_path_params(item_id: int, name: str, ) -> dict:  # Эндпоинт, в�
     }
 
 
-@router.get("/")
+@router.get("/books")
 def get_query_params() -> dict:
     return {
         "DB_PORT": "some port",

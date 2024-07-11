@@ -17,5 +17,12 @@ async def get_async_session():
     async with async_session() as session:
         yield session
 
+def get_sync_session():
+    session = SessionLocal()
+    try:
+        yield session
+    finally:
+        session.close()
+
 async def get_user_db(session: AsyncSession = Depends(get_async_session)):
     yield SQLAlchemyUserDatabase(session, User)
